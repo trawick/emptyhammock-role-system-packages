@@ -1,0 +1,2 @@
+---
+apticron_email: "{% if server_type == 'vagrant' %}root{% else %}{{ admin_email }}{% endif %}"

@@ -1,0 +1,54 @@
+---
+- name: "Update apt cache"
+  apt: update_cache=yes
+
+- name: Make sure python-software-properties is installed before adding repos
+  apt: pkg=python-software-properties state=present
+
+- name: Add ppa repo for certbot
+  apt_repository: repo='ppa:certbot/certbot'
+  register: certbot_repo
+
+- name: Update apt cache for certbot repo
+  apt: update_cache=yes
+  when: certbot_repo.changed
+
+- name: Add Nodesource apt key
+  apt_key:
+    url: https://keyserver.ubuntu.com/pks/lookup?op=get&fingerprint=on&search=0x1655A0AB68576280
+    id: "68576280"
+    state: present
+
+- name: Add ppa repo for nodejs
+  apt_repository: repo="deb https://deb.nodesource.com/node_6.x {{ ansible_distribution_release }} main"
+  register: nodejs_repo
+
+- name: Update apt cache for nodejs repo
+  apt: update_cache=yes
+  when: nodejs_repo.changed
+
+- name: Install packages
+  apt: name={{ item }} state=present
+  with_items:
+    - acl
+    - apache2
+    - apticron
+    - aptitude
+    - build-essential
+    - certbot
+    - git
+    - libpq-dev
+    - nodejs
+    - postfix
+    - postgresql
+# The system python-psycopg2 package is used by Ansible; the Django app uses psycopg2 from its virtualenv.
+    - python-psycopg2
+    - python-virtualenv
+    - python3-dev
+    - redis-server
+# Add TLS to rsyslog for communicating with Papertrail or other log service.
+    - rsyslog-gnutls
+  notify: restart system httpd
+
+- name: Configure apticron
+  template: src=apticron.conf.j2 dest=/etc/apticron/apticron.conf
