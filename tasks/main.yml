@@ -48,6 +48,7 @@
     - redis-server
 # Add TLS to rsyslog for communicating with Papertrail or other log service.
     - rsyslog-gnutls
+    - ufw
   notify: restart system httpd
 
 - name: Configure apticron
