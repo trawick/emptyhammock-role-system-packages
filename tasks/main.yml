@@ -32,7 +32,6 @@
   with_items:
     - acl
     - apache2
-    - apticron
     - aptitude
     - build-essential
     - certbot
