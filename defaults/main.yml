@@ -1,2 +1,4 @@
 ---
 apticron_email: "{% if server_type == 'vagrant' %}root{% else %}{{ admin_email }}{% endif %}"
+install_postgres: "yes"
+install_nodejs: "yes"

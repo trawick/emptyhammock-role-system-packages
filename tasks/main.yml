@@ -2,8 +2,13 @@
 - name: "Update apt cache"
   apt: update_cache=yes
 
-- name: Make sure python-software-properties is installed before adding repos
+- name: Make sure python-software-properties is installed before adding repos (Ubuntu 16.04)
   apt: pkg=python-software-properties state=present
+  when: ansible_distribution == 'Ubuntu' and ansible_distribution_release == 'xenial'
+
+- name: Make sure software-properties-common is installed before adding repos (Ubuntu >= 18.04)
+  apt: pkg=software-properties-common state=present
+  when: ansible_distribution == 'Ubuntu' and ansible_distribution_release != 'xenial'
 
 - name: Add ppa repo for certbot
   apt_repository: repo='ppa:certbot/certbot'
@@ -18,16 +23,18 @@
     url: https://keyserver.ubuntu.com/pks/lookup?op=get&fingerprint=on&search=0x1655A0AB68576280
     id: "68576280"
     state: present
+  when: install_nodejs == "yes"
 
 - name: Add ppa repo for nodejs
   apt_repository: repo="deb https://deb.nodesource.com/node_6.x {{ ansible_distribution_release }} main"
   register: nodejs_repo
+  when: install_nodejs == "yes"
 
 - name: Update apt cache for nodejs repo
   apt: update_cache=yes
-  when: nodejs_repo.changed
+  when: install_nodejs == "yes" and nodejs_repo.changed
 
-- name: Install packages
+- name: Install general-purpose packages
   apt: name={{ item }} state=present
   with_items:
     - acl
@@ -37,12 +44,8 @@
     - certbot
     - git
     - libpq-dev
-    - nodejs
     - postfix
-    - postgresql
     - python-openssl
-# The system python-psycopg2 package is used by Ansible; the Django app uses psycopg2 from its virtualenv.
-    - python-psycopg2
     - python-virtualenv
     - python3-dev
     - redis-server
@@ -50,6 +53,20 @@
     - rsyslog-gnutls
     - ufw
   notify: restart system httpd
+
+- name: Install Node package
+  apt: name={{ item }} state=present
+  with_items:
+  - nodejs
+  when: install_nodejs == "yes"
+
+- name: Install PostgreSQL packages
+  apt: name={{ item }} state=present
+  with_items:
+    - postgresql
+    # The system python-psycopg2 package is used by Ansible; the Django app uses psycopg2 from its virtualenv.
+    - python-psycopg2
+  when: install_postgres == "yes"
 
 - name: Purge apticron if it is installed.
   apt: name=apticron state=absent purge=yes
