@@ -1,5 +1,9 @@
 # Changes and migration requirements
 
+## Version 0.0.6
+
+* Install unzip
+
 ## Version 0.0.5
 
 * Allow skipping PostgreSQL installation (`install_postgres: "no"`).

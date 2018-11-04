@@ -52,6 +52,7 @@
 # Add TLS to rsyslog for communicating with Papertrail or other log service.
     - rsyslog-gnutls
     - ufw
+    - unzip
   notify: restart system httpd
 
 - name: Install Node package
