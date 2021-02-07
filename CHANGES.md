@@ -1,5 +1,11 @@
 # Changes and migration requirements
 
+## Version 0.0.7
+
+* nodejs: Choose OS repo or nodesource repo (`nodejs_repo: ["nodesource"|"os"]`)
+* nodejs: when installed from nodesource: Choose Version (`nodesource_nodejs_version: node_6.x`)
+* npm: Allow installing this separate package (`install_npm: "yes"`)
+
 ## Version 0.0.6
 
 * Install unzip

@@ -23,16 +23,16 @@
     url: https://keyserver.ubuntu.com/pks/lookup?op=get&fingerprint=on&search=0x1655A0AB68576280
     id: "68576280"
     state: present
-  when: install_nodejs == "yes"
+  when: install_nodejs == "yes" and nodejs_repo == "nodesource"
 
 - name: Add ppa repo for nodejs
-  apt_repository: repo="deb https://deb.nodesource.com/node_6.x {{ ansible_distribution_release }} main"
-  register: nodejs_repo
-  when: install_nodejs == "yes"
+  apt_repository: repo="deb https://deb.nodesource.com/{{ nodesource_nodejs_version }} {{ ansible_distribution_release }} main"
+  register: nodejs_repo_r
+  when: install_nodejs == "yes" and nodejs_repo == "nodesource"
 
 - name: Update apt cache for nodejs repo
   apt: update_cache=yes
-  when: install_nodejs == "yes" and nodejs_repo.changed
+  when: install_nodejs == "yes" and nodejs_repo == "nodesource" and nodejs_repo_r.changed
 
 - name: Install general-purpose packages
   apt: name={{ item }} state=present
@@ -60,6 +60,12 @@
   with_items:
   - nodejs
   when: install_nodejs == "yes"
+
+- name: Install NPM package
+  apt: name={{ item }} state=present
+  with_items:
+  - npm
+  when: install_npm == "yes"
 
 - name: Install PostgreSQL packages
   apt: name={{ item }} state=present
