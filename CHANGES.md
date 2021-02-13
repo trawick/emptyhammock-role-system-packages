@@ -1,5 +1,16 @@
 # Changes and migration requirements
 
+## Version 0.0.8
+
+* `nodesource_repo` now defaults to `"os"`.  Set to `"nodesource"` to install node from
+  the nodesource apt repo.
+
+* Allow de-installation of arbitrary apt packages, to handle the case where a package is
+  no longer needed.  Set `system_packages_to_remove` to a list of packages to remove.
+
+* Allow installation of arbitrary apt packages as long as the repo is configured.  Set
+  `extra_system_packages` to a list of additional packages to install.
+
 ## Version 0.0.7
 
 * nodejs: Choose OS repo or nodesource repo (`nodejs_repo: ["nodesource"|"os"]`)

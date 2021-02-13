@@ -3,5 +3,7 @@ apticron_email: "{% if server_type == 'vagrant' %}root{% else %}{{ admin_email }
 install_postgres: "yes"
 install_nodejs: "yes"
 install_npm: "no"
-nodejs_repo: "nodesource"
+nodejs_repo: "os"
 nodesource_nodejs_version: node_6.x
+extra_system_packages: []
+system_packages_to_remove: []

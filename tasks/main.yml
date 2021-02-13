@@ -55,6 +55,14 @@
     - unzip
   notify: restart system httpd
 
+- name: Install project-specific packages
+  apt: name={{ item }} state=present
+  with_items: "{{ extra_system_packages }}"
+
+- name: Remove project-specific packages
+  apt: name={{ item }} state=absent
+  with_items: "{{ system_packages_to_remove }}"
+
 - name: Install Node package
   apt: name={{ item }} state=present
   with_items:
