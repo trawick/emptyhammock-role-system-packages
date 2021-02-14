@@ -35,8 +35,8 @@
   when: install_nodejs == "yes" and nodejs_repo == "nodesource" and nodejs_repo_r.changed
 
 - name: Install general-purpose packages
-  apt: name={{ item }} state=present
-  with_items:
+  apt:
+    pkg:
     - acl
     - apache2
     - aptitude
@@ -56,31 +56,25 @@
   notify: restart system httpd
 
 - name: Install project-specific packages
-  apt: name={{ item }} state=present
-  with_items: "{{ extra_system_packages }}"
+  apt: name="{{ extra_system_packages }}" state=present
 
 - name: Remove project-specific packages
-  apt: name={{ item }} state=absent
-  with_items: "{{ system_packages_to_remove }}"
+  apt: name="{{ system_packages_to_remove }}" state=absent
 
 - name: Install Node package
-  apt: name={{ item }} state=present
-  with_items:
-  - nodejs
+  apt: name=nodejs state=present
   when: install_nodejs == "yes"
 
 - name: Install NPM package
-  apt: name={{ item }} state=present
-  with_items:
-  - npm
+  apt: name=npm state=present
   when: install_npm == "yes"
 
 - name: Install PostgreSQL packages
-  apt: name={{ item }} state=present
-  with_items:
-    - postgresql
-    # The system python-psycopg2 package is used by Ansible; the Django app uses psycopg2 from its virtualenv.
-    - python-psycopg2
+  apt:
+    pkg:
+      - postgresql
+      # The system python-psycopg2 package is used by Ansible; the Django app uses psycopg2 from its virtualenv.
+      - python-psycopg2
   when: install_postgres == "yes"
 
 - name: Purge apticron if it is installed.

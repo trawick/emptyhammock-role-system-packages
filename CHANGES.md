@@ -1,5 +1,9 @@
 # Changes and migration requirements
 
+## Version 0.0.9
+
+* Fix deprecation warnings with Ansible 2.10.
+
 ## Version 0.0.8
 
 * `nodesource_repo` now defaults to `"os"`.  Set to `"nodesource"` to install node from
