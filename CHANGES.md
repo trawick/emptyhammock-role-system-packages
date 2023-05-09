@@ -1,5 +1,9 @@
 # Changes and migration requirements
 
+## Version 0.0.10
+
+* Support Ubuntu >= 20.
+
 ## Version 0.0.9
 
 * Fix deprecation warnings with Ansible 2.10.
