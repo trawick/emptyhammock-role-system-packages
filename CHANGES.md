@@ -1,5 +1,9 @@
 # Changes and migration requirements
 
+## Version 0.0.11
+
+* Install `pkg-config` package.
+
 ## Version 0.0.10
 
 * Support Ubuntu >= 20.

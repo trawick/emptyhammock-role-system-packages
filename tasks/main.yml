@@ -45,6 +45,7 @@
     - certbot
     - git
     - libpq-dev
+    - pkg-config
     - postfix
     - python3-dev
     - redis-server
