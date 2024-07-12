@@ -1,5 +1,11 @@
 # Changes and migration requirements
 
+## Version 0.0.12
+
+* Support Docker-based Python application (via emptyhammock-role-docker-application);
+  set `application_mode` to `"docker"`.
+* Support Ubuntu 24.
+
 ## Version 0.0.11
 
 * Install `pkg-config` package.

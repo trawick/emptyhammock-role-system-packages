@@ -35,6 +35,24 @@
   apt: update_cache=yes
   when: install_nodejs == "yes" and nodejs_repo == "nodesource" and nodejs_repo_r.changed
 
+- set_fact:
+    python_psycopg2_package: "python-psycopg2"
+  when: ansible_distribution_major_version|int < 24
+
+- set_fact:
+    python_psycopg2_package: "python3-psycopg2"
+  when: ansible_distribution_major_version|int >= 24
+
+- set_fact:
+    python_openssl_package: "python-openssl"
+    python_virtualenv_package: "python-virtualenv"
+  when: ansible_distribution_major_version|int < 20
+
+- set_fact:
+    python_openssl_package: "python3-openssl"
+    python_virtualenv_package: "python3-virtualenv"
+  when: ansible_distribution_major_version|int >= 20
+
 - name: Install general-purpose packages
   apt:
     pkg:
@@ -43,31 +61,31 @@
     - aptitude
     - build-essential
     - certbot
-    - git
-    - libpq-dev
     - pkg-config
     - postfix
-    - python3-dev
     - redis-server
 # Add TLS to rsyslog for communicating with Papertrail or other log service.
     - rsyslog-gnutls
     - ufw
     - unzip
+    - "{{ python_openssl_package }}"
   notify: restart system httpd
 
-- name: Install packages for Ubuntu < 20
+- name: Install native application support packages
   apt:
     pkg:
-    - python-openssl
-    - python-virtualenv
-  when: ansible_distribution == "Ubuntu" and ansible_distribution_major_version < "20"
+    - git
+    - libpq-dev
+    - "{{ python_virtualenv_package }}"
+    - python3-dev
+  when: application_mode == "native"
 
-- name: Install packages for Ubuntu >= 20
+- name: Install Docker application support packages
   apt:
     pkg:
-    - python3-openssl
-    - python3-virtualenv
-  when: ansible_distribution == "Ubuntu" and ansible_distribution_major_version >= "20"
+      - python3-docker
+      - python3-pip
+  when: application_mode == "docker"
 
 - name: Install project-specific packages
   apt: name="{{ extra_system_packages }}" state=present
@@ -88,8 +106,39 @@
     pkg:
       - postgresql
       # The system python-psycopg2 package is used by Ansible; the Django app uses psycopg2 from its virtualenv.
-      - python-psycopg2
+      - "{{ python_psycopg2_package }}"
   when: install_postgres == "yes"
 
 - name: Purge apticron if it is installed.
   apt: name=apticron state=absent purge=yes
+
+- name: Add Docker GPG apt Key
+  apt_key:
+    url: https://download.docker.com/linux/ubuntu/gpg
+    state: present
+  when: application_mode == "docker"
+
+- name: Add Docker Repository
+  apt_repository:
+    repo: deb https://download.docker.com/linux/ubuntu jammy stable
+    state: present
+  when: application_mode == "docker"
+
+- name: Update apt and install docker-ce
+  apt:
+    name: docker-ce
+    state: latest
+    update_cache: true
+  when: application_mode == "docker"
+
+- name: Install AWS CLI
+  snap:
+    name: aws-cli
+    classic: true
+    state: present
+  when: application_mode == "docker" and ansible_distribution_major_version|int >= 24
+
+- name: Install AWS CLI
+  pip:
+    name: awscli
+  when: application_mode == "docker" and ansible_distribution_major_version|int < 24

@@ -7,3 +7,4 @@ nodejs_repo: "os"
 nodesource_nodejs_version: node_6.x
 extra_system_packages: []
 system_packages_to_remove: []
+application_mode: "native"
